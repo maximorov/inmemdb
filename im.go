@@ -3,7 +3,7 @@ package mimd
 func NewInMemoryDatabase() *DB {
 	return &DB{
 		storages: []storage{
-			NewStorage(),
+			newStorage(),
 		},
 	}
 }
@@ -15,8 +15,8 @@ type DB struct {
 
 func (r *DB) Get(k string) (string, bool) {
 	for i := r.lastStorageId; i > -1; i-- {
-		if v, ok := r.storages[i].values[k]; ok && !v.Deleted() {
-			return v.Value(), ok
+		if v, ok := r.storages[i].values[k]; ok {
+			return v.Value(), !v.Deleted()
 		}
 	}
 
@@ -40,13 +40,15 @@ func (r *DB) Delete(k string) {
 }
 
 func (r *DB) StartTransaction() {
-	r.storages = append(r.storages, NewStorage())
+	r.storages = append(r.storages, newStorage())
 	r.lastStorageId++
 }
 
 func (r *DB) Commit() {
 	if r.lastStorageId != 0 {
-		r.storages[r.lastStorageId].MergeInto(&r.storages[r.lastStorageId-1])
+		r.storages[r.lastStorageId].MergeInto(r.lastStorageId-1, &r.storages[r.lastStorageId-1])
+		r.deleteLastStorage()
+		r.lastStorageId--
 	}
 }
 

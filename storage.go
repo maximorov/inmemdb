@@ -1,6 +1,6 @@
 package mimd
 
-func NewStorage() storage {
+func newStorage() storage {
 	return storage{
 		values: make(map[string]*value),
 	}
@@ -10,10 +10,14 @@ type storage struct {
 	values map[string]*value
 }
 
-func (r *storage) MergeInto(outerStorage *storage) {
+func (r *storage) MergeInto(dstId int8, outerStorage *storage) {
 	for k, v := range r.values {
 		if v.Deleted() {
-			delete(outerStorage.values, k)
+			if dstId == 0 { // root storage
+				delete(outerStorage.values, k)
+			} else {
+				outerStorage.values[k].Delete()
+			}
 		} else {
 			outerStorage.values[k] = v
 		}

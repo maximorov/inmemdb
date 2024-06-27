@@ -50,12 +50,12 @@ func TestInMemory_NT(t *testing.T) {
 
 	db.Delete(`key1`)
 	db.Commit()
-	if v, _ := db.Get(`key1`); v != `` {
+	if _, ok := db.Get(`key1`); ok {
 		t.Error(`Value 3 mismatch`)
 	}
 
 	db.Commit()
-	if v, _ := db.Get(`key1`); v != `` {
+	if _, ok := db.Get(`key1`); ok {
 		t.Error(`Value 4 mismatch`)
 	}
 }
