@@ -1,4 +1,4 @@
-package mimd
+package inmemdb
 
 func newStorage() storage {
 	return storage{
